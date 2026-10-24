@@ -256,6 +256,10 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .terms .fine{font-size:.8rem;color:var(--muted);font-style:italic}
 .terms-check{display:flex;gap:10px;align-items:center;font-weight:700;cursor:pointer;padding-top:4px}
 .terms-check input{width:20px;height:20px;accent-color:#732982;flex:none}
+.have-account{margin:-6px 0 14px;font-size:.9rem;color:var(--muted)}
+.linkbtn{font:inherit;font-weight:700;background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer}
+.pinbox{margin-bottom:16px;padding:12px 14px;border-radius:10px;border:2px solid transparent;background:linear-gradient(var(--sunk),var(--sunk)) padding-box,var(--rainbow) border-box;display:grid;gap:8px;font-size:.9rem}
+.pinbox .inline{display:flex;gap:8px;flex-wrap:wrap}.pinbox input{flex:1;min-width:120px}
 .empty{color:var(--muted);text-align:center;padding:24px 8px}
 .admin{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
 .admin .inline{display:flex;gap:8px;flex-wrap:wrap}
@@ -364,9 +368,26 @@ header.panel{margin-bottom:20px}
         <p class="notice" style="margin-top:12px">Não deu pra conectar. Confere a internet e recarrega a página.</p>
       </section>
 
+      <section class="panel" id="vLogin" hidden>
+        <h2>Entrar</h2>
+        <p class="sub" style="margin:4px 0 14px">Já se inscreveu em outro aparelho? Coloca teu nome e o PIN que tu criou.</p>
+        <form id="loginForm" novalidate style="display:grid;gap:14px">
+          <div class="row2">
+            <label class="field"><span class="label">Nome</span><input type="text" id="lName" autocomplete="username" maxlength="60" placeholder="O nome da inscrição"></label>
+            <label class="field"><span class="label">PIN</span><input type="password" id="lPin" inputmode="numeric" autocomplete="current-password" maxlength="4" placeholder="4 números"></label>
+          </div>
+          <p class="err" id="loginErr"></p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button class="btn" type="submit" id="loginBtn">Entrar</button>
+            <button class="linkbtn" type="button" id="toSignup">Ainda não tem conta? Inscreve aqui</button>
+          </div>
+        </form>
+      </section>
+
       <section class="panel closed-box" id="vClosed" hidden>
         <h2>Inscrições encerradas 🔒</h2>
         <p class="sub" style="margin-top:8px" id="closedText">O desafio já começou e a porta fechou. Fica de olho no ranking e se prepara pro Simasfitness 3.</p>
+        <button class="btn ghost small" type="button" id="closedLogin">Já tem conta? Entrar</button>
       </section>
 
       <!-- Inscrição -->
@@ -378,6 +399,7 @@ header.panel{margin-bottom:20px}
           </div>
         </div>
         <p class="signup-deadline" id="signupDeadline"></p>
+        <p class="have-account" id="haveAccount">Já tem conta? <button class="linkbtn" type="button" id="toLogin">Faz login aqui</button></p>
         <form id="signupForm" novalidate>
           <div class="field">
             <span class="label">Foto (obrigatória)</span>
@@ -393,6 +415,7 @@ header.panel{margin-bottom:20px}
             <label class="field"><span class="label">Altura</span><span class="unit"><input type="number" id="fHeight" inputmode="decimal" min="100" max="250" step="1" required placeholder="175"><span>cm</span></span></label>
             <label class="field"><span class="label">Peso inicial</span><span class="unit"><input type="number" id="fWeight" inputmode="decimal" min="30" max="300" step="0.1" required placeholder="78,5"><span>kg</span></span></label>
           </div>
+          <label class="field" id="pinField"><span class="label">Crie um PIN de 4 números (pra entrar em outro aparelho)</span><input type="password" id="fPin" inputmode="numeric" autocomplete="new-password" maxlength="4" placeholder="Ex.: 2580"></label>
           <div class="field">
             <span class="label">Meta</span>
             <div class="goals" role="radiogroup">
@@ -424,6 +447,11 @@ header.panel{margin-bottom:20px}
 
       <!-- Ficha -->
       <section class="panel" id="vSheet" hidden>
+        <div class="pinbox" id="pinBox" hidden>
+          <b>Cria teu PIN</b> pra conseguir entrar no celular e no PC com a mesma conta.
+          <div class="inline"><input type="password" id="pPin" inputmode="numeric" maxlength="4" placeholder="4 números"><button class="btn small" id="pinSave" type="button">Salvar PIN</button></div>
+          <span class="err" id="pinErr"></span>
+        </div>
         <div class="panel-head">
           <div class="me">
             <div class="avatar lg" id="meAvatar"></div>
@@ -523,7 +551,7 @@ header.panel{margin-bottom:20px}
       </ul>
       <h3>Premiação</h3>
       <ul class="prize">
-        <li><span class="place">1º</span><span>Medalha primeiro lugar &amp; Ebook do Coach Geladero (vinimalvadao) 📔🥇</span></li>
+        <li><span class="place">1º</span><span>Medalha primeiro lugar &amp; 1 mês de IPTV 📺🥇</span></li>
         <li><span class="place">2º</span><span>Medalha segundo lugar &amp; 1 mês de CapCut (provido pelo Cas)</span></li>
         <li><span class="place">3º</span><span>Medalha terceiro lugar (bagre)</span></li>
       </ul>
@@ -737,7 +765,7 @@ header.panel{margin-bottom:20px}
   }
 
   // ---- views ----
-  function show(view){ for(const v of ["vLoading","vOffline","vSignup","vSheet","vClosed"]) $(v).hidden = v!==view; }
+  function show(view){ for(const v of ["vLoading","vOffline","vSignup","vSheet","vClosed","vLogin"]) $(v).hidden = v!==view; }
 
   function renderPeriod(){
     const s=dayDate(1), e=dayDate(TOTAL);
@@ -832,9 +860,11 @@ header.panel{margin-bottom:20px}
     renderRank();
     renderFinal();
     if(!db){ return; }
+    if(!me && loginMode){ show("vLogin"); return; }
     if(!me && regClosed()){ $("closedText").textContent=reg().closed; show("vClosed"); return; }
     if(!me || editing){ fillSignup(); show("vSignup"); return; }
     renderSheet(); show("vSheet");
+    const cu=firebase.auth().currentUser; $("pinBox").hidden = !(cu && cu.isAnonymous);
   }
 
   function fillSignup(){
@@ -845,7 +875,7 @@ header.panel{margin-bottom:20px}
     $("cancelEdit").hidden = !isEdit;
     // Depois da inscrição, só a foto pode mudar
     for(const id of ["fName","fAge","fHeight","fWeight"]) $(id).disabled = isEdit;
-    $("termsBox").hidden = isEdit;
+    $("termsBox").hidden = isEdit; $("pinField").hidden = isEdit; $("haveAccount").hidden = isEdit;
     document.querySelectorAll('input[name=goal]').forEach(g=>g.disabled=isEdit);
     if(isEdit){ $("signupTitle").textContent="Trocar foto"; $("signupSub").textContent="Só a foto muda. O resto ficou gravado na pedra."; $("signupBtn").textContent="Salvar foto"; }
     if(!canWrite){ $("signupErr").textContent="Teu acesso é só pra olhar. Pede pro organizador te liberar."; $("signupBtn").disabled=true; }
@@ -1075,6 +1105,8 @@ header.panel{margin-bottom:20px}
     if(!(weight>=30&&weight<=300)) return err.textContent="Peso em kg, entre 30 e 300. Sem mentir.";
     if(!goal) return err.textContent="Escolhe uma meta, indeciso.";
     if(!photoData) return err.textContent="Sem foto não entra. Mostra a cara!";
+    const pin=$("fPin").value.trim();
+    if(!/^\d{4}$/.test(pin)) return err.textContent="O PIN precisa ter 4 números.";
     if(!$("fTerms").checked) return err.textContent="Assina o termo aí, covarde.";
     const body = {
       ...(me?{days:me.days||{}, joined:me.joined, status:me.status||""}:{days:{}, joined:today(), status:""}),
@@ -1082,12 +1114,17 @@ header.panel{margin-bottom:20px}
       updatedAt: new Date().toISOString(),
     };
     body.score = totals({...body,_id:uid}).pts;
+    body.login = loginSlug(name);
+    if(!body.login) return err.textContent="Usa pelo menos uma letra ou número no nome.";
     $("signupBtn").disabled=true;
     try{
+      const cu=firebase.auth().currentUser;
+      if(cu && cu.isAnonymous) await cu.linkWithCredential(firebase.auth.EmailAuthProvider.credential(loginEmail(name), pinPass(pin)));
       await db.doc("participants/"+uid).set(body);
       editing=false; photoData=null;
     }catch(e){
-      err.textContent = e&&e.code==="permission-denied" ? "Seu acesso não permite se inscrever. Peça ao organizador acesso de participante." : "Não foi possível salvar. Tente de novo em instantes.";
+      const c=e&&e.code||"";
+      err.textContent = c==="auth/email-already-in-use"||c==="auth/credential-already-in-use" ? "Esse nome já tem conta. Se for tu, clica em \"Faz login aqui\"." : c==="permission-denied" ? "Seu acesso não permite se inscrever. Peça ao organizador acesso de participante." : "Não foi possível salvar. Tente de novo em instantes.";
     }finally{ $("signupBtn").disabled=!canWrite; }
   });
 
@@ -1315,6 +1352,34 @@ header.panel{margin-bottom:20px}
   // ---- inicialização ----
   if(location.hash==="#forum") setTab("forum");
   renderPeriod();
+  // ---- login por nome + PIN (vira e-mail/senha internos do Firebase) ----
+  let loginMode=false;
+  const loginSlug = n => n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const loginEmail = n => loginSlug(n)+"@simasfitness2.app";
+  const pinPass = pin => "sf2-pin-"+pin;
+  $("toLogin").onclick=()=>{ loginMode=true; $("loginErr").textContent=""; render(); };
+  $("closedLogin").onclick=()=>{ loginMode=true; render(); };
+  $("toSignup").onclick=()=>{ loginMode=false; render(); };
+  $("loginForm").addEventListener("submit", async ev=>{
+    ev.preventDefault();
+    const err=$("loginErr"); err.textContent="";
+    const name=$("lName").value.trim(), pin=$("lPin").value.trim();
+    if(!loginSlug(name)) return err.textContent="Coloca teu nome.";
+    if(!/^\d{4}$/.test(pin)) return err.textContent="O PIN tem 4 números.";
+    $("loginBtn").disabled=true;
+    try{ await firebase.auth().signInWithEmailAndPassword(loginEmail(name), pinPass(pin)); location.reload(); }
+    catch(e){ const c=e&&e.code||""; err.textContent = c==="auth/too-many-requests" ? "Muita tentativa errada. Espera uns minutos." : "Nome ou PIN errado. Confere aí."; $("loginBtn").disabled=false; }
+  });
+  $("pinSave").onclick=async()=>{
+    const err=$("pinErr"), pin=$("pPin").value.trim(); err.textContent="";
+    if(!/^\d{4}$/.test(pin)) return err.textContent="O PIN precisa ter 4 números.";
+    try{
+      await firebase.auth().currentUser.linkWithCredential(firebase.auth.EmailAuthProvider.credential(loginEmail(me.name), pinPass(pin)));
+      const body={...me, login:loginSlug(me.name)}; delete body._id; await db.doc("participants/"+uid).set(body);
+      $("pinBox").hidden=true;
+    }catch(e){ err.textContent = (e&&e.code)==="auth/email-already-in-use" ? "Já existe conta com esse nome. Fala com o organizador." : "Não salvou o PIN. Tenta de novo."; }
+  };
+
   // ---- Firebase ----
   const firebaseConfig = {
     apiKey: "AIzaSyA0G_qSK5eEVzGnLskGS8leXCwC7XNzK0A",
