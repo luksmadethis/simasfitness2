@@ -522,7 +522,6 @@ header.panel{margin-bottom:20px}
       <div class="composer-foot">
         <label class="btn ghost small" for="pPhotos">📷 Fotos (até 2)</label>
         <input type="file" id="pPhotos" accept="image/*" multiple hidden>
-        <button class="btn ghost small" id="pSound" type="button" aria-pressed="false">🔊 Anexar gemidão</button>
         <span class="err" id="pErr"></span>
         <button class="btn" id="pSend" type="button">Postar</button>
       </div>
@@ -1180,27 +1179,26 @@ header.panel{margin-bottom:20px}
     ev.target.value=""; renderComposerPhotos();
   };
   let pSound=false, soundObs=null; const soundPlayed=new Set();
-  $("pSound").onclick=()=>{ pSound=!pSound; $("pSound").setAttribute("aria-pressed",pSound); $("pSound").textContent = pSound ? "🔊 Gemidão anexado ✓" : "🔊 Anexar gemidão"; if(pSound) playNofap(); };
   let posting=false;
   $("pSend").onclick=async()=>{
     if(posting) return;
     const err=$("pErr"); err.textContent="";
     if(!db||!me) return err.textContent="Te inscreve primeiro pra postar.";
     const text=$("pText").value.trim();
-    if(!text && !pPhotos.length && !pSound) return err.textContent="Post vazio não é prova, é fé.";
+    if(!text && !pPhotos.length) return err.textContent="Post vazio não é prova, é fé.";
     const day=challengeDayToday();
     const earns = day && !postDaysOf(me).has(day);
     const id=Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7);
     posting=true; $("pSend").disabled=true;
     try{
-      await db.doc("posts/"+id).set({author:uid, text, photos:pPhotos, sound: pSound ? "gemidao" : null, createdAt:new Date().toISOString(), day: day||null});
-      $("pText").value=""; pPhotos=[]; renderComposerPhotos(); pSound=false; $("pSound").setAttribute("aria-pressed","false"); $("pSound").textContent="🔊 Anexar gemidão";
+      await db.doc("posts/"+id).set({author:uid, text, photos:pPhotos, sound: "gemidao", createdAt:new Date().toISOString(), day: day||null});
+      $("pText").value=""; pPhotos=[]; renderComposerPhotos();
       if(earns){ $("mTitle").textContent=reg().postTitle; $("mText").textContent=fill(reg().postText,{d:day}); $("mClose").textContent=reg().postBtn; openModal(); }
     }catch(e){ err.textContent = e&&e.code==="quota_exceeded" ? "Espaço lotado. Tenta com menos fotos." : "Não postou. Tenta de novo."; }
     finally{ posting=false; $("pSend").disabled=false; }
   };
   // Reações: a ordem da lista não pode mudar (o índice fica salvo); só acrescentar no fim
-  const REACTS = ["❤️","🔥","💪","😂","🐂","🐄","🦍","🐓","🗿","🤡","🧌","🦆","🐌","🍞","🥩","🫃","🧂","💀","🫡","🤌","🪳","🐊","🦨","🦐","🐸","🥚","🦭","🐖","🧅","🪑"];
+  const REACTS = ["❤️","🔥","💪","😂","🐂","🐄","🦍","🐓","🗿","🤡","🧌","🦆","🐌","🍞","🥩","🫃","🧂","💀","🫡","🤌","🪳","🐊","🦨","🦐","🐸","🥚","🦭","🐖","🧅","🪑","🍆","🐔","🍗","🏳️‍🌈","🏳️‍⚧️","🌈","💅","👬","👭","🇧🇷","🇮🇱","🖕"];
   let openPicker=null;
   const reactIdx = l => l.e ?? 0;
   async function toggleReact(postId, idx){
@@ -1242,7 +1240,7 @@ header.panel{margin-bottom:20px}
       const meta=document.createElement("div"); meta.className="meta"; meta.textContent=timeAgo(p.createdAt)+(p.day?` · Dia ${p.day}`:"");
       who.append(nm,meta); head.append(avatarFor(p.author),who); art.append(head);
       if(p.text){ const t=document.createElement("p"); t.className="post-text"; t.textContent=p.text; art.append(t); }
-      if(p.sound==="gemidao"){ const sb=document.createElement("button"); sb.type="button"; sb.className="sound"; sb.textContent="▶️ 🔊 Tocar gemidão"; sb.onclick=playNofap; art.append(sb); art.dataset.sound=p._id; }
+      { const sb=document.createElement("button"); sb.type="button"; sb.className="sound"; sb.textContent="▶️ 🔊 Tocar gemidão"; sb.onclick=playNofap; art.append(sb); art.dataset.sound=p._id; }
       if(p.photos&&p.photos.length){ const ph=document.createElement("div"); ph.className="post-photos";
         for(const src of p.photos){ const im=document.createElement("img"); im.src=src; im.alt="Foto da prova"; im.loading="lazy"; im.onclick=()=>{ $("viewerImg").src=src; $("viewer").hidden=false; }; ph.append(im); }
         art.append(ph); }
