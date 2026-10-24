@@ -250,6 +250,12 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .admincode{font-size:.85rem;margin-bottom:16px;overflow-wrap:anywhere}
 .admincode code{background:var(--sunk);padding:2px 6px;border-radius:6px}
 .region{display:inline-block;margin-top:6px;font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--sunk)}
+.terms{border:2px solid transparent;background:linear-gradient(var(--sunk),var(--sunk)) padding-box,var(--rainbow) border-box;border-radius:10px;padding:14px 16px;display:grid;gap:8px;font-size:.9rem}
+.terms p,.terms ul{margin:0}
+.terms ul{padding-left:1.2em;display:grid;gap:3px}
+.terms .fine{font-size:.8rem;color:var(--muted);font-style:italic}
+.terms-check{display:flex;gap:10px;align-items:center;font-weight:700;cursor:pointer;padding-top:4px}
+.terms-check input{width:20px;height:20px;accent-color:#732982;flex:none}
 .empty{color:var(--muted);text-align:center;padding:24px 8px}
 .admin{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
 .admin .inline{display:flex;gap:8px;flex-wrap:wrap}
@@ -394,6 +400,19 @@ header.panel{margin-bottom:20px}
               <label class="goal"><input type="radio" name="goal" id="gGanhar" value="ganhar"><span>Ganhar peso</span></label>
               <label class="goal"><input type="radio" name="goal" id="gPerder" value="perder"><span>Perder peso</span></label>
             </div>
+          </div>
+          <div class="terms" id="termsBox">
+            <strong>📜 Termo de compromisso solene, juramentado e sem valor jurídico nenhum</strong>
+            <p>Eu, aqui abaixo marcado, juro pela minha mãe (viva, morta ou só profundamente decepcionada comigo) que:</p>
+            <ul>
+              <li>vou treinar mesmo com preguiça, chuva, ressaca ou crise existencial;</li>
+              <li>não vou marcar atividade que não fiz, porque Deus tá vendo e o grupo também;</li>
+              <li>reconheço que "amanhã eu começo" não é treino, é mentira;</li>
+              <li>aceito ser zoado sem dó nenhum se falhar no NoFap;</li>
+              <li>se desistir antes do fim, viro oficialmente frango 🐔 e perco o direito de opinar sobre shape alheio.</li>
+            </ul>
+            <p class="fine">Sei que isso não vale nada na justiça, mas vale tudo na resenha.</p>
+            <label class="terms-check"><input type="checkbox" id="fTerms"><span>Li (mentira), entendi e assino com o suor do meu sangue.</span></label>
           </div>
           <p class="err" id="signupErr"></p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -826,6 +845,7 @@ header.panel{margin-bottom:20px}
     $("cancelEdit").hidden = !isEdit;
     // Depois da inscrição, só a foto pode mudar
     for(const id of ["fName","fAge","fHeight","fWeight"]) $(id).disabled = isEdit;
+    $("termsBox").hidden = isEdit;
     document.querySelectorAll('input[name=goal]').forEach(g=>g.disabled=isEdit);
     if(isEdit){ $("signupTitle").textContent="Trocar foto"; $("signupSub").textContent="Só a foto muda. O resto ficou gravado na pedra."; $("signupBtn").textContent="Salvar foto"; }
     if(!canWrite){ $("signupErr").textContent="Teu acesso é só pra olhar. Pede pro organizador te liberar."; $("signupBtn").disabled=true; }
@@ -1055,6 +1075,7 @@ header.panel{margin-bottom:20px}
     if(!(weight>=30&&weight<=300)) return err.textContent="Peso em kg, entre 30 e 300. Sem mentir.";
     if(!goal) return err.textContent="Escolhe uma meta, indeciso.";
     if(!photoData) return err.textContent="Sem foto não entra. Mostra a cara!";
+    if(!$("fTerms").checked) return err.textContent="Assina o termo aí, covarde.";
     const body = {
       ...(me?{days:me.days||{}, joined:me.joined, status:me.status||""}:{days:{}, joined:today(), status:""}),
       name, age, height, weight, goal, photo: photoData ?? (me&&me.photo) ?? null,
