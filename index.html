@@ -1124,7 +1124,7 @@ header.panel{margin-bottom:20px}
       editing=false; photoData=null;
     }catch(e){
       const c=e&&e.code||"";
-      err.textContent = c==="auth/email-already-in-use"||c==="auth/credential-already-in-use" ? "Esse nome já tem conta. Se for tu, clica em \"Faz login aqui\"." : c==="permission-denied" ? "Seu acesso não permite se inscrever. Peça ao organizador acesso de participante." : "Não foi possível salvar. Tente de novo em instantes.";
+      err.textContent = c==="auth/email-already-in-use"||c==="auth/credential-already-in-use" ? "Esse nome já tem conta. Se for tu, clica em \"Faz login aqui\"." : c==="permission-denied" ? "Seu acesso não permite se inscrever. Peça ao organizador acesso de participante." : (c==="auth/operation-not-allowed"||c==="auth/admin-restricted-operation" ? "O login por nome+PIN ainda não foi ativado. Avisa o organizador." : c==="auth/network-request-failed" ? "Sem internet. Confere a conexão e tenta de novo." : c==="auth/weak-password" ? "PIN inválido. Usa 4 números." : "Não foi possível salvar. Tenta de novo. (erro: "+(c||"desconhecido")+")");
     }finally{ $("signupBtn").disabled=!canWrite; }
   });
 
