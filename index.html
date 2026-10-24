@@ -215,7 +215,7 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .devcode{font-size:.82rem;color:var(--muted);margin:0 0 12px;overflow-wrap:anywhere}
 .devcode code{font-size:.8rem;background:var(--sunk);padding:2px 6px;border-radius:6px;color:var(--fg)}
 #aFrom{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
-.countdown{position:relative;margin:0 0 16px;padding:20px 16px 18px;border:3px solid #FFED00;border-radius:16px;background:var(--surface);display:grid;justify-items:center;gap:10px;text-align:center;animation:cdGlow 2s ease-in-out infinite}
+.countdown{position:relative;margin:0 0 16px;padding:20px 16px 18px;border:4px solid transparent;border-radius:16px;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#732982,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#732982,#E40303) border-box;background-size:100% 100%,200% 100%;display:grid;justify-items:center;gap:10px;text-align:center;animation:cdGlow 2s ease-in-out infinite,cdBorder 3s linear infinite}
 .cd-label{font-family:var(--f-display);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:1.15rem}
 .cd-boxes{display:flex;align-items:flex-start;justify-content:center;gap:clamp(4px,1.5vw,14px)}
 .cd-unit{display:grid;justify-items:center;min-width:0}
@@ -223,11 +223,12 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .cd-sep,.cd-unit b,.cd-label{background:linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#732982,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#732982,#E40303);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:cdWave 3s linear infinite}
 .cd-unit b{font-family:var(--f-display);font-weight:800;font-size:clamp(2.6rem,11vw,5.5rem);line-height:1;font-variant-numeric:tabular-nums;animation:cdWave 3s linear infinite,cdShine 1.6s ease-in-out infinite}
 .cd-sep{font-family:var(--f-display);font-weight:800;font-size:clamp(2rem,8vw,4.2rem);line-height:1.1}
-.closed-box{border:3px solid #FFED00;text-align:center;display:grid;gap:6px;justify-items:center;padding-block:28px}
+.closed-box{border:3px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--rainbow) border-box;text-align:center;display:grid;gap:6px;justify-items:center;padding-block:28px}
 .closed-box h2{font-size:2rem}
 @keyframes cdWave{from{background-position:0% 50%}to{background-position:-200% 50%}}
 @keyframes cdShine{0%,100%{filter:drop-shadow(0 0 4px rgba(255,237,0,.45)) drop-shadow(0 0 10px rgba(115,41,130,.25))}50%{filter:drop-shadow(0 0 10px rgba(255,237,0,.9)) drop-shadow(0 0 22px rgba(0,77,255,.45))}}
-@keyframes cdGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,237,0,.35),0 0 18px rgba(255,237,0,.35)}50%{box-shadow:0 0 0 4px rgba(255,237,0,.25),0 0 34px rgba(255,237,0,.7)}}
+@keyframes cdBorder{from{background-position:0 0,0% 50%}to{background-position:0 0,-200% 50%}}
+@keyframes cdGlow{0%,100%{box-shadow:0 0 16px rgba(255,140,0,.3)}50%{box-shadow:0 0 34px rgba(115,41,130,.55)}}
 @media (prefers-reduced-motion:reduce){.countdown,.cd-unit b,.cd-sep,.cd-label{animation:none}}
 .signup-deadline{margin:0 0 14px;padding:10px 12px;border-radius:8px;background:var(--accent-soft);font-weight:600}
 .admincode{font-size:.85rem;margin-bottom:16px;overflow-wrap:anywhere}
@@ -261,9 +262,12 @@ h1{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;c
 .btn.ghost{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--rainbow) border-box}
 .day.sel .d,.day.sel .dt,.day.sel .p{color:#fff;-webkit-text-fill-color:#fff}
 .stat:nth-child(1){box-shadow:inset 4px 0 0 var(--r1)}.stat:nth-child(2){box-shadow:inset 4px 0 0 var(--r4)}.stat:nth-child(3){box-shadow:inset 4px 0 0 var(--r5)}
-.check input:checked+span{border-color:var(--r6);background:var(--accent-soft)}
-.check input:checked+span em{color:var(--accent)}
-.goal input:checked+span{border-color:var(--r5);box-shadow:inset 0 0 0 1px var(--r5)}
+/* Campos e seleções: borda arco-íris fixa; marcado = fundo escuro e texto branco */
+input[type=text],input[type=email],input[type=number],input[type=date],textarea,select,.goal span,.check span{
+  border:2px solid transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,var(--rainbow) border-box;box-shadow:none}
+.goal input:checked+span,.check input:checked+span{background:linear-gradient(var(--btnbg),var(--btnbg)) padding-box,var(--rainbow) border-box;color:#fff;box-shadow:none}
+.check input:checked+span em{color:#fff}
+input:disabled,.goal input:disabled+span{opacity:.6}
 .rank li:nth-child(1){background:linear-gradient(90deg,color-mix(in srgb,var(--r1) 14%,transparent),color-mix(in srgb,var(--r6) 14%,transparent))}
 .like.add{border-style:dashed}
 .sound{font:inherit;font-weight:700;justify-self:start;border-radius:999px;padding:8px 16px;cursor:pointer}
@@ -284,7 +288,6 @@ header.panel{margin-bottom:20px}
     <div>
       <h1>Desafio Simasfitness 2</h1>
       <p class="sub" id="period">Carregando o caos…</p>
-      <span class="region" id="regionTag"></span>
     </div>
     <span class="label" id="todayLbl"></span>
   </header>
@@ -709,8 +712,7 @@ header.panel{margin-bottom:20px}
     if(t<s) msg=fill(R.before,V);
     else if(t>e) msg=fill(R.ended,V);
     else { const n=dayList().indexOf(t)+1; msg = n ? fill(R.during,{...V,n}) : R.sunday; }
-    $("regionTag").textContent=R.tag;
-    $("period").textContent = (testMode()?"Modo teste ligado: todos os dias liberados · ":"") + (cfg&&cfg.startDate ? msg : msg + " (data de início ainda não definida pelo organizador)");
+    $("period").textContent = (testMode()?"Modo teste ligado: todos os dias liberados · ":"") + msg;
   }
 
   // ---- encerramento ----
@@ -783,7 +785,7 @@ header.panel{margin-bottom:20px}
       const t=Math.floor(left/1000);
       $("cdD").textContent=Math.floor(t/86400); $("cdH").textContent=pad2(Math.floor(t%86400/3600));
       $("cdM").textContent=pad2(Math.floor(t%3600/60)); $("cdS").textContent=pad2(t%60);
-      $("cdLabel").textContent = me ? reg().cdIn : reg().cdOpen;
+      $("cdLabel").textContent = me ? "O desafio começa em" : "Inscrições fecham em";
       const dl=$("signupDeadline"); if(dl) dl.textContent=fill(reg().deadline,{s:fmt(startDate())});
     }
     const closed=regClosed(); if(wasClosed!==null && closed!==wasClosed) render(); wasClosed=closed;
