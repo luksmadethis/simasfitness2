@@ -180,7 +180,7 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .tab{font:inherit;font-weight:700;border:0;background:transparent;color:var(--muted);padding:8px 18px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:6px}
 .tab.on{background:var(--accent);color:var(--accent-fg)}
 .badge{font-size:.72rem;background:var(--sunk);color:var(--fg);border-radius:999px;padding:0 7px}
-.tab.on .badge{background:color-mix(in srgb,var(--accent-fg) 25%,transparent);color:var(--accent-fg)}
+.tab.on .badge{-webkit-text-fill-color:var(--accent-fg);background:color-mix(in srgb,var(--accent-fg) 25%,transparent);color:var(--accent-fg)}
 .forum{display:grid;gap:16px;max-width:720px;margin:0 auto}
 .composer{display:grid;gap:12px}
 .composer-photos{display:flex;gap:8px;flex-wrap:wrap}
@@ -215,6 +215,15 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .devcode{font-size:.82rem;color:var(--muted);margin:0 0 12px;overflow-wrap:anywhere}
 .devcode code{font-size:.8rem;background:var(--sunk);padding:2px 6px;border-radius:6px;color:var(--fg)}
 #aFrom{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
+.countdown{display:grid;gap:4px;justify-items:end;margin-left:auto}
+.cd-boxes{display:flex;align-items:baseline;gap:4px}
+.cd-boxes b{font-family:var(--f-display);font-size:1.9rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;background:var(--rainbow);-webkit-background-clip:text;background-clip:text;color:transparent;min-width:1.4ch;text-align:right}
+.cd-boxes small{font-size:.72rem;color:var(--muted);margin-right:6px;font-weight:600}
+@media (max-width:560px){.countdown{justify-items:start;margin-left:0}}
+.signup-deadline{margin:0 0 14px;padding:10px 12px;border-radius:8px;background:var(--accent-soft);font-weight:600}
+.admincode{font-size:.85rem;margin-bottom:16px;overflow-wrap:anywhere}
+.admincode code{background:var(--sunk);padding:2px 6px;border-radius:6px}
+.region{display:inline-block;margin-top:6px;font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--sunk)}
 .empty{color:var(--muted);text-align:center;padding:24px 8px}
 .admin{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
 .admin .inline{display:flex;gap:8px;flex-wrap:wrap}
@@ -229,10 +238,17 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 header.panel{border-top:0;position:relative;overflow:hidden;padding-top:26px}
 header.panel::before{content:"";position:absolute;inset:0 0 auto;height:8px;background:var(--rainbow)}
 h1{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:.5px rgba(0,0,0,.25)}
-.btn:not(.ghost),.tab.on{background:var(--rainbow);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+/* Botões: fundo escuro normal, texto arco-íris */
+:root{--btnbg:#161b22}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--btnbg:#2a323d}}
+:root[data-theme="dark"]{--btnbg:#2a323d}
+.btn:not(.ghost),.tab.on,.sound,.day.sel{
+  background-image:var(--rainbow),linear-gradient(var(--btnbg),var(--btnbg));
+  -webkit-background-clip:text,padding-box;background-clip:text,padding-box;
+  color:transparent;-webkit-text-fill-color:transparent;text-shadow:none;font-weight:800}
 .btn.ghost{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--rainbow) border-box}
-.day.sel{background:var(--rainbow);border-color:transparent;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
-.day.sel .dt,.day.sel .p{color:#fff}
+.day.sel{border-color:var(--btnbg)}
+.day.sel .d,.day.sel .dt,.day.sel .p{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .stat:nth-child(1){box-shadow:inset 4px 0 0 var(--r1)}.stat:nth-child(2){box-shadow:inset 4px 0 0 var(--r4)}.stat:nth-child(3){box-shadow:inset 4px 0 0 var(--r5)}
 .check input:checked+span{border-color:var(--r6);background:var(--accent-soft)}
 .check input:checked+span em{color:var(--accent)}
@@ -240,7 +256,7 @@ h1{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;c
 .rank li:nth-child(1){background:linear-gradient(90deg,color-mix(in srgb,var(--r1) 14%,transparent),color-mix(in srgb,var(--r6) 14%,transparent))}
 .like.add{border-style:dashed}
 #pSound[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
-.sound{font:inherit;font-weight:700;justify-self:start;border:0;border-radius:999px;padding:8px 16px;cursor:pointer;background:var(--rainbow);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+.sound{font:inherit;font-weight:700;justify-self:start;border:0;border-radius:999px;padding:8px 16px;cursor:pointer}
 .picker{display:flex;flex-wrap:wrap;gap:4px;background:var(--sunk);border-radius:10px;padding:8px}
 .picker button{font-size:1.35rem;line-height:1;border:0;background:transparent;border-radius:8px;padding:6px;cursor:pointer}
 .picker button:hover,.picker button.on{background:var(--surface);box-shadow:inset 0 0 0 2px var(--accent)}
@@ -259,9 +275,15 @@ header.panel{margin-bottom:20px}
     <div>
       <h1>Desafio Simasfitness 2</h1>
       <p class="sub" id="period">Carregando o caos…</p>
+      <span class="region" id="regionTag"></span>
     </div>
     <span class="label" id="todayLbl"></span>
+    <div class="countdown" id="countdown" hidden>
+      <span class="label" id="cdLabel">Inscrições fecham em</span>
+      <div class="cd-boxes"><b id="cdD">0</b><small>dias</small><b id="cdH">00</b><small>h</small><b id="cdM">00</b><small>min</small><b id="cdS">00</b><small>s</small></div>
+    </div>
   </header>
+  <div class="panel admincode" id="adminCode" hidden>Código deste aparelho: <code class="devid"></code> <button class="btn ghost small copyid" type="button">Copiar</button></div>
 
   <nav class="tabs" role="tablist">
     <button class="tab on" id="tabBtnDesafio" role="tab" aria-selected="true" type="button">Desafio</button>
@@ -303,6 +325,11 @@ header.panel{margin-bottom:20px}
         <p class="notice" style="margin-top:12px">Não deu pra conectar. Confere a internet e recarrega a página.</p>
       </section>
 
+      <section class="panel" id="vClosed" hidden>
+        <h2>Inscrições encerradas 🔒</h2>
+        <p class="sub" style="margin-top:8px" id="closedText">O desafio já começou e a porta fechou. Fica de olho no ranking e se prepara pro Simasfitness 3.</p>
+      </section>
+
       <!-- Inscrição -->
       <section class="panel" id="vSignup" hidden>
         <div class="panel-head">
@@ -311,6 +338,7 @@ header.panel{margin-bottom:20px}
             <p class="sub" id="signupSub">Bota teus dados e entra na brincadeira. Sem desistir no dia 3, combinado?</p>
           </div>
         </div>
+        <p class="signup-deadline" id="signupDeadline"></p>
         <form id="signupForm" novalidate>
           <div class="field">
             <span class="label">Foto (obrigatória)</span>
@@ -335,7 +363,6 @@ header.panel{margin-bottom:20px}
             </div>
           </div>
           <p class="err" id="signupErr"></p>
-          <p class="devcode">Código deste aparelho: <code class="devid"></code> <button class="btn ghost small copyid" type="button">Copiar</button><br><small>Trocou de celular? Manda esse código pro organizador que ele puxa tua ficha pra cá.</small></p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn" type="submit" id="signupBtn">Tô dentro</button>
             <button class="btn ghost" type="button" id="cancelEdit" hidden>Cancelar</button>
@@ -355,7 +382,6 @@ header.panel{margin-bottom:20px}
           </div>
           <button class="btn ghost small" id="editProfile" type="button">Trocar foto</button>
         </div>
-        <p class="devcode">Código deste aparelho: <code class="devid"></code> <button class="btn ghost small copyid" type="button">Copiar</button></p>
         <div class="stats">
           <div class="stat"><div class="label">Pontos</div><div class="n" id="sPts">0</div></div>
           <div class="stat"><div class="label">Dias feitos</div><div class="n" id="sDays">0/30</div></div>
@@ -497,6 +523,82 @@ header.panel{margin-bottom:20px}
   ];
   // Meta de água: 35 ml por kg do peso mais recente, arredondada para 0,1 L
   const waterGoal = p => { const w = latestWeight(p) || p.weight; return w ? (Math.round(w*0.035*10)/10).toFixed(1).replace(".",",")+" L" : "meta diária"; };
+  // ---- sotaque do dia: alterna a cada dia entre 5 regiões ----
+  const REG = {
+    carioca: { tag:"Sotaque do dia: Carioca 🏖️",
+      signup:"Coé, mermão! Bota teus dados aí e entra na resenha. Vacilar no dia 3 é papo de vacilão, hein.",
+      before:"Começa {s}, acaba {e}. Aproveita o último biscoito Globo, parceiro.",
+      during:"Dia {n} de 30 · vai até {e} · bora que tá maneiro", sunday:"Domingão de praia liberado, mas sem exagerar no mate com limão.", ended:"Acabou, rapá! {s} a {e}. Chora ou comemora, tu que sabe.",
+      bonusOn:"Combo fechado, sinistro: +1 🎁", bonusOff:"Fecha tudo aí, mermão, e leva +1",
+      saved:"Salvo, parceiro ✅", modalTitle:"Caraca, que brabo!", modalBtn:"Sou cria", postTitle:"Prova aceita, mermão!", postText:"Postou no Dia {d} e garantiu +1. Sem foto é papo furado.", postBtn:"Tô voando",
+      emptyRank:"Ranking vazio, rapá. Chega junto e passa vergonha primeiro.", emptyFeed:"Nenhuma prova ainda. Alguém mete o louco e posta aí.", closed:"Já era, mermão. O desafio começou e a porta fechou. Fica de olho no ranking.",
+      deadline:"⏳ Inscrição só até {s} às 00:00. Depois disso, perdeu, playboy.", cdOpen:"Inscrição fecha em, mermão:", cdIn:"O desafio começa em, parceiro:",
+      popup:["Fechou o Dia {d}, mermão! +1 na conta, sinistro.","Dia {d} completo. Tu é brabo, rapá. +1.","Caraca! Dia {d} 100%. Leva +1 aí."],
+      zoeira:["Ih, vacilou, mermão. Punheteiro!","Tá de sacanagem? Mão boba de novo, rapá?","Sinistro… só que não. Amanhã tu segura, cria."],
+      st:{ first:["Tu é o primeiro, mermão. Rei do morro por W.O."], zero:["Dia {d} zerado geral. Chega junto e sai na frente, parceiro."],
+        top:["Dia {d}: tu amassou geral, mermão. Sinistro!","Dia {d}: ninguém te pegou. Cria demais."], tie:["Dia {d}: empatado no topo, rapá. Desempata aí."],
+        good:["Dia {d}: na frente de {p}% da galera. Maneiro demais, mermão.","Dia {d}: {p}% ficou pra trás. Tá voando, parceiro."],
+        bad:["Dia {d}: {q}% da galera te passou. Tá de vacilo, mermão?","Dia {d}: atrás de {q}% da galera. Bora, rapá, acorda!"], wait:["Começa {s}. Aproveita o último biscoito Globo, mermão."] } },
+    paulista: { tag:"Sotaque do dia: Paulista 🏙️",
+      signup:"E aí, mano! Coloca teus dados e cola no rolê. Desistir no dia 3 é muito embaçado, tá ligado?",
+      before:"Começa {s}, acaba {e}. Aproveita o último pastel da feira, mano.",
+      during:"Dia {n} de 30 · vai até {e} · bora, meu", sunday:"Domingão, mano. Descansa, mas sem exagerar na coxinha.", ended:"Acabou, mano! {s} a {e}. Chora ou comemora, firmeza?",
+      bonusOn:"Combo fechado, da hora: +1 🎁", bonusOff:"Fecha tudo, meu, e ganha +1",
+      saved:"Salvo, mano ✅", modalTitle:"Da hora, mano!", modalBtn:"Sou zika", postTitle:"Prova aceita, meu!", postText:"Postou no Dia {d} e garantiu +1. Sem foto é caô, mano.", postBtn:"Tô suave",
+      emptyRank:"Ranking vazio, mano. Cola e passa vergonha primeiro.", emptyFeed:"Nenhuma prova ainda, meu. Alguém posta aí, tá ligado?", closed:"Já era, mano. O desafio começou e fechou a porta. Fica de olho no ranking, firmeza?",
+      deadline:"⏳ Inscrição só até {s} às 00:00, mano. Depois disso, já era.", cdOpen:"Inscrição fecha em, mano:", cdIn:"O desafio começa em, meu:",
+      popup:["Fechou o Dia {d}, mano. +1, da hora!","Dia {d} completo, meu. Zika demais. +1.","Dia {d} 100%, tá ligado? +1 na conta."],
+      zoeira:["Embaçado, mano. Punheteiro!","Meu, de novo? Mão boba é foda.","Hoje o trampo foi só do pulso, né, mano?"],
+      st:{ first:["Tu é o primeiro, mano. Rei do rolê por W.O."], zero:["Dia {d} zerado geral, meu. Sai na frente, firmeza?"],
+        top:["Dia {d}: tu amassou geral, mano. Da hora!","Dia {d}: ninguém te pegou, meu. Zika."], tie:["Dia {d}: empatado no topo, mano. Desempata aí."],
+        good:["Dia {d}: na frente de {p}% da galera. Da hora, mano.","Dia {d}: {p}% ficou pra trás. Tá suave, meu."],
+        bad:["Dia {d}: {q}% te passou, mano. Tá embaçado, hein.","Dia {d}: atrás de {q}% da galera, meu. Bora, tá ligado?"], wait:["Começa {s}, mano. Aproveita o último pastel."] } },
+    nordestino: { tag:"Sotaque do dia: Nordestino 🌵",
+      signup:"Oxe, chega mais! Bota teus dados e entra nessa arretada. Desistir no dia 3 é coisa de abestado, visse?",
+      before:"Começa {s}, acaba {e}. Aproveita o último cuscuz com ovo, bichinho.",
+      during:"Dia {n} de 30 · vai até {e} · bora, que tá massa", sunday:"Domingo é de rede, visse? Mas sem exagerar na tapioca.", ended:"Acabou, oxe! {s} a {e}. Chora ou comemora, meu rei.",
+      bonusOn:"Combo fechado, arretado: +1 🎁", bonusOff:"Fecha tudo, bichinho, e ganha +1",
+      saved:"Salvo, visse ✅", modalTitle:"Eita, arretado demais!", modalBtn:"Sou massa", postTitle:"Prova aceita, oxe!", postText:"Postou no Dia {d} e garantiu +1. Sem foto é lorota, visse?", postBtn:"Vixe, sou bom",
+      emptyRank:"Ranking vazio, oxe. Chega e passa vergonha primeiro, bichinho.", emptyFeed:"Nenhuma prova ainda, visse? Alguém posta aí.", closed:"Vixe, já era. O desafio começou e a porta fechou. Fica de olho no ranking, meu rei.",
+      deadline:"⏳ Inscrição só até {s} às 00:00, visse? Depois disso, já era.", cdOpen:"Inscrição fecha em, oxe:", cdIn:"O desafio começa em, meu rei:",
+      popup:["Eita! Fechou o Dia {d}. +1, arretado!","Dia {d} completo, bichinho. Massa demais. +1.","Vixe, Dia {d} 100%! +1 na conta, meu rei."],
+      zoeira:["Oxe, punheteiro!","Vixe, mão boba de novo, bichinho?","Abestado, amanhã tu segura, visse?"],
+      st:{ first:["Tu é o primeiro, oxe. Rei do sertão por W.O."], zero:["Dia {d} zerado geral, visse? Sai na frente, bichinho."],
+        top:["Dia {d}: tu amassou geral, meu rei. Arretado!","Dia {d}: ninguém te pegou, oxe. Massa demais."], tie:["Dia {d}: empatado no topo, visse? Desempata aí."],
+        good:["Dia {d}: na frente de {p}% da galera. Arretado, meu rei!","Dia {d}: {p}% ficou pra trás. Tá massa, visse?"],
+        bad:["Dia {d}: {q}% te passou, oxe. Tá de brincadeira, bichinho?","Dia {d}: atrás de {q}% da galera. Vixe, acorda, abestado!"], wait:["Começa {s}, visse? Aproveita o último cuscuz."] } },
+    mineiro: { tag:"Sotaque do dia: Mineiro 🧀",
+      signup:"Uai, sô, chega mais! Põe seus dados aí e entra nesse trem. Desistir no dia 3 é feio dimais, cê sabe.",
+      before:"Começa {s}, acaba {e}. Aproveita o último pão de queijo, sô.",
+      during:"Dia {n} de 30 · vai até {e} · bora, que esse trem é bão", sunday:"Domingo é dia de descanso, uai. Mas sem exagerar no torresmo.", ended:"Acabou, uai! {s} a {e}. Chora ou comemora, sô.",
+      bonusOn:"Combo fechado, trem bão: +1 🎁", bonusOff:"Fecha tudo, sô, e ganha +1",
+      saved:"Salvo, uai ✅", modalTitle:"Nó, que trem bão!", modalBtn:"Sou bão dimais", postTitle:"Prova aceita, sô!", postText:"Postou no Dia {d} e garantiu +1. Sem foto é conversa, uai.", postBtn:"Uai, sou bom",
+      emptyRank:"Ranking vazio, uai. Chega e passa vergonha primeiro, sô.", emptyFeed:"Nenhuma prova ainda, sô. Alguém posta esse trem aí.", closed:"Nó, já era, sô. O desafio começou e a porta fechou. Fica de olho no ranking.",
+      deadline:"⏳ Inscrição só até {s} às 00:00, uai. Depois disso, já era.", cdOpen:"Inscrição fecha em, sô:", cdIn:"O desafio começa em, uai:",
+      popup:["Nó! Fechou o Dia {d}. +1, trem bão!","Dia {d} completo, sô. Bão dimais. +1.","Uai, Dia {d} 100%! +1 procê."],
+      zoeira:["Uai, punheteiro, sô!","Nó, mão boba de novo, cê?","Esse trem de NoFap num é procê não, sô."],
+      st:{ first:["Cê é o primeiro, sô. Rei do trem por W.O."], zero:["Dia {d} zerado geral, uai. Sai na frente, sô."],
+        top:["Dia {d}: cê amassou geral, sô. Trem bão!","Dia {d}: ninguém te pegou, uai. Bão dimais."], tie:["Dia {d}: empatado no topo, sô. Desempata esse trem."],
+        good:["Dia {d}: na frente de {p}% da galera. Bão dimais, sô.","Dia {d}: {p}% ficou pra trás. Nó, que trem bão."],
+        bad:["Dia {d}: {q}% te passou, uai. Que trem é esse, sô?","Dia {d}: atrás de {q}% da galera. Acorda, uai!"], wait:["Começa {s}, sô. Aproveita o último pão de queijo."] } },
+    sulista: { tag:"Sotaque do dia: Sulista 🧉",
+      signup:"Bah, tchê, chega mais! Bota teus dados e entra nessa. Desistir no dia 3 é coisa de guri mole, capaz?",
+      before:"Começa {s}, acaba {e}. Aproveita o último churrasco, tchê.",
+      during:"Dia {n} de 30 · vai até {e} · bora, que tá tri", sunday:"Domingo de chimarrão, tchê. Descansa, mas sem exagerar na costela.", ended:"Bah, acabou! {s} a {e}. Chora ou comemora, tchê.",
+      bonusOn:"Combo fechado, tri legal: +1 🎁", bonusOff:"Fecha tudo, tchê, e ganha +1",
+      saved:"Salvo, tchê ✅", modalTitle:"Bah, tri demais!", modalBtn:"Sou bagual", postTitle:"Prova aceita, tchê!", postText:"Postou no Dia {d} e garantiu +1. Sem foto é lorota, guri.", postBtn:"Bah, sou tri",
+      emptyRank:"Ranking vazio, tchê. Chega e passa vergonha primeiro.", emptyFeed:"Nenhuma prova ainda, tchê. Alguém posta aí, bah.", closed:"Bah, já era, tchê. O desafio começou e a porteira fechou. Fica de olho no ranking.",
+      deadline:"⏳ Inscrição só até {s} às 00:00, tchê. Depois disso, capaz que entre.", cdOpen:"Inscrição fecha em, tchê:", cdIn:"O desafio começa em, bah:",
+      popup:["Bah! Fechou o Dia {d}. +1, tri!","Dia {d} completo, tchê. Bagual demais. +1.","Barbaridade, Dia {d} 100%! +1 na conta."],
+      zoeira:["Bah, punheteiro, tchê!","Barbaridade, mão boba de novo, guri?","Capaz que tu segura amanhã, tchê."],
+      st:{ first:["Tu é o primeiro, tchê. Rei do pampa por W.O."], zero:["Dia {d} zerado geral, bah. Sai na frente, tchê."],
+        top:["Dia {d}: tu amassou geral, tchê. Tri bagual!","Dia {d}: ninguém te pegou, bah. Tri demais."], tie:["Dia {d}: empatado no topo, tchê. Desempata aí."],
+        good:["Dia {d}: na frente de {p}% da galera. Tri legal, tchê.","Dia {d}: {p}% ficou pra trás. Bah, tá voando."],
+        bad:["Dia {d}: {q}% te passou, tchê. Barbaridade!","Dia {d}: atrás de {q}% da galera. Acorda, guri!"], wait:["Começa {s}, tchê. Aproveita o último churrasco."] } },
+  };
+  const REG_KEYS = ["carioca","paulista","nordestino","mineiro","sulista"];
+  const reg = () => { const d=new Date(); const n=Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5); return REG[REG_KEYS[n%REG_KEYS.length]]; };
+  const fill = (t, v={}) => t.replace(/\{(\w)\}/g,(m,k)=> v[k]!==undefined ? v[k] : m);
   // Zoeira para os dias sem NoFap (varia por dia)
   const ZOEIRA = [
     "Punheteiro!",
@@ -584,14 +686,16 @@ header.panel{margin-bottom:20px}
   }
 
   // ---- views ----
-  function show(view){ for(const v of ["vLoading","vOffline","vSignup","vSheet"]) $(v).hidden = v!==view; }
+  function show(view){ for(const v of ["vLoading","vOffline","vSignup","vSheet","vClosed"]) $(v).hidden = v!==view; }
 
   function renderPeriod(){
     const s=dayDate(1), e=dayDate(TOTAL);
     const t=today(); let msg;
-    if(t<s) msg=`Começa ${fmt(s)}, acaba ${fmt(e)}. Aproveita a última pizza.`;
-    else if(t>e) msg=`Acabou! ${fmt(s)} a ${fmt(e)}. Pode chorar ou comemorar.`;
-    else { const n=dayList().indexOf(t)+1; msg = n ? `Dia ${n} de ${TOTAL} · vai até ${fmt(e)}` : `Domingo: descanso liberado, mas sem exagerar no churrasco.`; }
+    const R=reg(), V={s:fmt(s),e:fmt(e)};
+    if(t<s) msg=fill(R.before,V);
+    else if(t>e) msg=fill(R.ended,V);
+    else { const n=dayList().indexOf(t)+1; msg = n ? fill(R.during,{...V,n}) : R.sunday; }
+    $("regionTag").textContent=R.tag;
     $("period").textContent = (testMode()?"Modo teste ligado: todos os dias liberados · ":"") + (cfg&&cfg.startDate ? msg : msg + " (data de início ainda não definida pelo organizador)");
   }
 
@@ -653,11 +757,32 @@ header.panel{margin-bottom:20px}
     ranked.forEach((r,i)=>{ const li=document.createElement("li"); li.innerHTML=`<i style="background:${LINE_COLORS[Math.min(i,LINE_COLORS.length-1)]}"></i>`; li.append(r.p.name||"Participante"); el2.append(li); });
   }
 
+  // ---- prazo de inscrição: até 00:00 do dia de início ----
+  const regDeadline = () => parse(startDate()).getTime(); // meia-noite local do Dia 1
+  const regClosed = () => Date.now() >= regDeadline();
+  const pad2 = n => String(n).padStart(2,"0");
+  let wasClosed = null;
+  function tick(){
+    const left = regDeadline() - Date.now(), box=$("countdown");
+    box.hidden = left<=0;
+    if(left>0){
+      const t=Math.floor(left/1000);
+      $("cdD").textContent=Math.floor(t/86400); $("cdH").textContent=pad2(Math.floor(t%86400/3600));
+      $("cdM").textContent=pad2(Math.floor(t%3600/60)); $("cdS").textContent=pad2(t%60);
+      $("cdLabel").textContent = me ? reg().cdIn : reg().cdOpen;
+      const dl=$("signupDeadline"); if(dl) dl.textContent=fill(reg().deadline,{s:fmt(startDate())});
+    }
+    const closed=regClosed(); if(wasClosed!==null && closed!==wasClosed) render(); wasClosed=closed;
+  }
+  setInterval(tick,1000);
+
   function render(){
+    tick();
     renderPeriod();
     renderRank();
     renderFinal();
     if(!db){ return; }
+    if(!me && regClosed()){ $("closedText").textContent=reg().closed; show("vClosed"); return; }
     if(!me || editing){ fillSignup(); show("vSignup"); return; }
     renderSheet(); show("vSheet");
   }
@@ -665,7 +790,7 @@ header.panel{margin-bottom:20px}
   function fillSignup(){
     const isEdit = !!me;
     $("signupTitle").textContent = isEdit ? "Editar dados" : "Inscrição";
-    $("signupSub").textContent = isEdit ? "Ajusta aí. Teus pontos continuam intactos." : "Bota teus dados e entra na brincadeira. Sem desistir no dia 3, combinado?";
+    $("signupSub").textContent = isEdit ? "Ajusta aí. Teus pontos continuam intactos." : reg().signup;
     $("signupBtn").textContent = isEdit ? "Salvar" : "Tô dentro";
     $("cancelEdit").hidden = !isEdit;
     // Depois da inscrição, só a foto pode mudar
@@ -775,11 +900,11 @@ header.panel{margin-bottom:20px}
     const e={}; for(const t of TASKS) e[t.key]=!!$("c_"+t.key)?.checked;
     $("edTotal").textContent = dayPts(e);
     const full=isFull(e), h=$("bonusHint");
-    h.textContent = full ? "Combo fechado: +1 de brinde 🎁" : "Fecha tudo e ganha +1 de brinde";
+    h.textContent = full ? reg().bonusOn : reg().bonusOff;
     h.classList.toggle("on", full);
     const saved = sel!=null && !!(me.days||{})[sel];
     const z=$("zoeira"); z.hidden = !(saved && !(me.days[sel]||{}).nofap && !e.nofap);
-    if(!z.hidden) z.textContent = ZOEIRA[(sel*7+3) % ZOEIRA.length];
+    if(!z.hidden){ const zl=[...reg().zoeira,...ZOEIRA]; z.textContent = zl[(sel*7+3) % zl.length]; }
     renderStatus();
     $("edSaved").hidden=true;
   }
@@ -800,7 +925,7 @@ header.panel{margin-bottom:20px}
     const el=$("status"); if(!el||!me) return;
     el.className="status";
     const day = sel==null ? 1 : sel;
-    const say = (k, cls, v={}) => { if(cls) el.classList.add(cls); el.textContent = pick(ST[k], day).replace("{d}",day).replace("{p}",v.p).replace("{q}",v.q).replace("{s}",fmt(dayDate(1))); };
+    const say = (k, cls, v={}) => { if(cls) el.classList.add(cls); el.textContent = pick(reg().st[k]||ST[k], day).replace("{d}",day).replace("{p}",v.p).replace("{q}",v.q).replace("{s}",fmt(dayDate(1))); };
     if(sel==null) return say("wait");
     const e={}; for(const t of TASKS) e[t.key]=!!$("c_"+t.key)?.checked;
     const mine=dayPts(e)+(postDaysOf(me).has(day)?1:0);
@@ -847,7 +972,7 @@ header.panel{margin-bottom:20px}
     const ranked = people.map(p=>({p, ...totals(p)})).sort((a,b)=>b.pts-a.pts || b.done-a.done || (a.p.name||"").localeCompare(b.p.name||""));
     $("countLbl").textContent = ranked.length ? `${ranked.length} participante${ranked.length>1?"s":""}` : "";
     list.textContent="";
-    if(!ranked.length){ const li=document.createElement("li"); li.className="empty"; li.style.display="block"; li.textContent="Ranking vazio. Seja o primeiro a passar vergonha."; list.append(li); return; }
+    if(!ranked.length){ const li=document.createElement("li"); li.className="empty"; li.style.display="block"; li.textContent=reg().emptyRank; list.append(li); return; }
     let pos=0, last=null;
     ranked.forEach((r,i)=>{
       if(r.pts!==last){ pos=i+1; last=r.pts; }
@@ -891,6 +1016,7 @@ header.panel{margin-bottom:20px}
     const age=parseInt($("fAge").value,10);
     const height=parseFloat($("fHeight").value), weight=parseFloat(String($("fWeight").value).replace(",","."));
     const goal=(document.querySelector('input[name=goal]:checked')||{}).value;
+    if(!me && regClosed()) return err.textContent="Inscrições encerradas. Chegou atrasado.";
     if(!name) return err.textContent="Faltou o nome, chefe.";
     if(people.some(p=>p._id!==uid && (p.name||"").trim().toLowerCase()===name.toLowerCase())) return err.textContent="Esse nome já tem dono. Usa um apelido.";
     if(!(age>=10&&age<=100)) return err.textContent="Idade de verdade aí, entre 10 e 100.";
@@ -935,8 +1061,8 @@ header.panel{margin-bottom:20px}
     saving=true; $("edSave").disabled=true; $("edErr").textContent="";
     try{
       await db.doc("participants/"+uid).set(body);
-      $("edSaved").hidden=false; document.activeElement&&document.activeElement.blur(); editorFor=null;
-      if(isFull(entry) && !wasFull){ $("mTitle").textContent="Brabo demais!"; $("mClose").textContent="Sou foda"; $("mText").textContent=pick(POPUP, sel).replace("{d}",sel); openModal(); }
+      $("edSaved").textContent=reg().saved; $("edSaved").hidden=false; document.activeElement&&document.activeElement.blur(); editorFor=null;
+      if(isFull(entry) && !wasFull){ $("mTitle").textContent=reg().modalTitle; $("mClose").textContent=reg().modalBtn; $("mText").textContent=fill(pick(reg().popup, sel),{d:sel}); openModal(); }
     }catch(e){ $("edErr").textContent="Não salvou. Tenta de novo."; }
     finally{ saving=false; $("edSave").disabled=!canWrite; }
   };
@@ -1040,7 +1166,7 @@ header.panel{margin-bottom:20px}
     try{
       await db.doc("posts/"+id).set({author:uid, text, photos:pPhotos, sound: pSound ? "gemidao" : null, createdAt:new Date().toISOString(), day: day||null});
       $("pText").value=""; pPhotos=[]; renderComposerPhotos(); pSound=false; $("pSound").setAttribute("aria-pressed","false"); $("pSound").textContent="🔊 Anexar gemidão";
-      if(earns){ $("mTitle").textContent="Prova aceita!"; $("mText").textContent=`Postou no Dia ${day} e garantiu +1. Sem foto não tem moral.`; $("mClose").textContent="Sou monstro"; openModal(); }
+      if(earns){ $("mTitle").textContent=reg().postTitle; $("mText").textContent=fill(reg().postText,{d:day}); $("mClose").textContent=reg().postBtn; openModal(); }
     }catch(e){ err.textContent = e&&e.code==="quota_exceeded" ? "Espaço lotado. Tenta com menos fotos." : "Não postou. Tenta de novo."; }
     finally{ posting=false; $("pSend").disabled=false; }
   };
@@ -1078,7 +1204,7 @@ header.panel{margin-bottom:20px}
     const feed=$("feed");
     const active=document.activeElement && document.activeElement.id && document.activeElement.id.startsWith("cm-") ? document.activeElement.id : null;
     feed.textContent="";
-    if(!posts.length){ const e=document.createElement("p"); e.className="panel empty"; e.textContent="Nenhuma prova ainda. Alguém tem que começar a ostentar."; feed.append(e); return; }
+    if(!posts.length){ const e=document.createElement("p"); e.className="panel empty"; e.textContent=reg().emptyFeed; feed.append(e); return; }
     for(const p of posts){
       const art=document.createElement("article"); art.className="panel post";
       const head=document.createElement("div"); head.className="post-head";
@@ -1186,6 +1312,7 @@ header.panel{margin-bottom:20px}
     if(uid) return; // já iniciado
     uid=u.uid; canWrite=true;
     document.querySelectorAll(".devid").forEach(el=>el.textContent=uid);
+    $("adminCode").hidden = location.hash!=="#admin";
 
     db.doc("config/admins").onSnapshot(s=>{ const d=s.exists?s.data():{}; isAdmin=Array.isArray(d.uids)&&d.uids.includes(uid); renderAdmin(); }, ()=>{});
     db.doc("config/challenge").onSnapshot(s=>{
