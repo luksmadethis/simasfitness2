@@ -901,7 +901,9 @@ header.panel{margin-bottom:20px}
     $("cancelEdit").hidden = !isEdit;
     // Depois da inscrição, só a foto pode mudar
     for(const id of ["fName","fAge","fHeight","fWeight"]) $(id).disabled = isEdit;
-    $("termsBox").hidden = isEdit; $("pinField").hidden = isEdit; $("haveAccount").hidden = isEdit;
+    const cuF=firebase.auth().currentUser, logged = !!(cuF && !cuF.isAnonymous);
+    $("termsBox").hidden = isEdit; $("pinField").hidden = isEdit || logged; $("haveAccount").hidden = isEdit || logged;
+    if(!isEdit && logged){ $("signupTitle").textContent="Termina tua inscrição"; $("signupSub").textContent="Tua conta já existe, mas a ficha ficou pela metade. Completa aqui que tá resolvido."; }
     document.querySelectorAll('input[name=goal]').forEach(g=>g.disabled=isEdit);
     if(isEdit){ $("signupTitle").textContent="Trocar foto"; $("signupSub").textContent="Só a foto muda. O resto ficou gravado na pedra."; $("signupBtn").textContent="Salvar foto"; }
     if(!canWrite){ $("signupErr").textContent="Teu acesso é só pra olhar. Pede pro organizador te liberar."; $("signupBtn").disabled=true; }
@@ -1132,7 +1134,8 @@ header.panel{margin-bottom:20px}
     if(!goal) return err.textContent="Escolhe uma meta, indeciso.";
     if(!photoData) return err.textContent="Sem foto não entra. Mostra a cara!";
     const pin=$("fPin").value.trim();
-    if(!/^\d{4}$/.test(pin)) return err.textContent="O PIN precisa ter 4 números.";
+    const curU=firebase.auth().currentUser, hasLogin = curU && !curU.isAnonymous;
+    if(!hasLogin && !/^\d{4}$/.test(pin)) return err.textContent="O PIN precisa ter 4 números.";
     if(!$("fTerms").checked) return err.textContent="Assina o termo aí, covarde.";
     const body = {
       ...(me?{days:me.days||{}, joined:me.joined, status:me.status||""}:{days:{}, joined:today(), status:""}),
@@ -1145,9 +1148,21 @@ header.panel{margin-bottom:20px}
     $("signupBtn").disabled=true;
     try{
       const cu=firebase.auth().currentUser;
-      if(cu && cu.isAnonymous) await cu.linkWithCredential(firebase.auth.EmailAuthProvider.credential(loginEmail(name), pinPass(pin)));
-      await db.doc("participants/"+uid).set(body);
+      let target=uid;
+      if(cu && cu.isAnonymous){
+        try{ await cu.linkWithCredential(firebase.auth.EmailAuthProvider.credential(loginEmail(name), pinPass(pin))); }
+        catch(le){
+          const lc=le&&le.code||"";
+          if(lc!=="auth/email-already-in-use" && lc!=="auth/credential-already-in-use") throw le;
+          // Conta com esse nome já existe (cadastro que ficou pela metade): tenta entrar com o PIN digitado e terminar a ficha
+          if(people.some(p=>p.login===body.login)) throw le;
+          try{ const res=await firebase.auth().signInWithEmailAndPassword(loginEmail(name), pinPass(pin)); target=res.user.uid; }
+          catch(se){ err.textContent="Esse nome já tem conta e o PIN não bate. Se for tu, usa o PIN que tu criou."; return; }
+        }
+      }
+      await db.doc("participants/"+target).set(body);
       editing=false; photoData=null;
+      if(target!==uid){ location.reload(); return; }
     }catch(e){
       const c=e&&e.code||"";
       err.textContent = c==="auth/email-already-in-use"||c==="auth/credential-already-in-use" ? "Esse nome já tem conta. Se for tu, clica em \"Faz login aqui\"." : c==="permission-denied" ? "Seu acesso não permite se inscrever. Peça ao organizador acesso de participante." : (c==="auth/operation-not-allowed"||c==="auth/admin-restricted-operation" ? "O login por nome+PIN ainda não foi ativado. Avisa o organizador." : c==="auth/network-request-failed" ? "Sem internet. Confere a conexão e tenta de novo." : c==="auth/weak-password" ? "PIN inválido. Usa 4 números." : "Não foi possível salvar. Tenta de novo. (erro: "+(c||"desconhecido")+")");
