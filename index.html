@@ -262,7 +262,9 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .pinbox .inline{display:flex;gap:8px;flex-wrap:wrap}.pinbox input{flex:1;min-width:120px}
 .day{position:relative}
 .day.closed{cursor:pointer}
-.day.closed::after{content:"🔒";position:absolute;top:2px;right:3px;font-size:.6rem;opacity:.75}
+.day.closed::after{position:absolute;top:1px;right:4px;font-size:.8rem;font-weight:900;line-height:1}
+.day.closed.done::after{content:"✓";color:var(--ok)}
+.day.closed.missed::after{content:"✕";color:var(--danger)}
 .day.closed .p{font-weight:800}
 .day-closed{font-weight:700;color:var(--muted)}
 .empty{color:var(--muted);text-align:center;padding:24px 8px}
