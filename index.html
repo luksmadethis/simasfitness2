@@ -260,6 +260,11 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .linkbtn{font:inherit;font-weight:700;background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer}
 .pinbox{margin-bottom:16px;padding:12px 14px;border-radius:10px;border:2px solid transparent;background:linear-gradient(var(--sunk),var(--sunk)) padding-box,var(--rainbow) border-box;display:grid;gap:8px;font-size:.9rem}
 .pinbox .inline{display:flex;gap:8px;flex-wrap:wrap}.pinbox input{flex:1;min-width:120px}
+.day{position:relative}
+.day.closed{cursor:pointer}
+.day.closed::after{content:"🔒";position:absolute;top:2px;right:3px;font-size:.6rem;opacity:.75}
+.day.closed .p{font-weight:800}
+.day-closed{font-weight:700;color:var(--muted)}
 .empty{color:var(--muted);text-align:center;padding:24px 8px}
 .admin{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
 .admin .inline{display:flex;gap:8px;flex-wrap:wrap}
@@ -489,6 +494,7 @@ header.panel{margin-bottom:20px}
           <div class="editor-foot">
             <div><span class="label">Pontos do dia</span> <span class="daytotal" id="edTotal">0</span><div class="bonus-hint" id="bonusHint">Fecha tudo e ganha +1 de brinde</div></div>
             <div style="display:flex;align-items:center;gap:12px">
+              <span class="day-closed" id="dayClosed" hidden>🔒 Dia fechado. Já era, não dá mais pra mexer.</span>
               <span class="saved" id="edSaved" hidden>Salvo ✅</span>
               <button class="btn" id="edSave" type="button">Salvar dia</button>
             </div>
@@ -724,6 +730,8 @@ header.panel{margin-bottom:20px}
   const dayDate = n => dayList()[n-1];
   const testMode = () => !!(cfg && cfg.testUnlock);
   const isOpen = n => testMode() || dayDate(n) <= today();
+  // Dia que já passou fica fechado: dá pra ver, mas não dá mais pra mexer
+  const isClosed = n => !testMode() && dayDate(n) < today();
 
   $("todayLbl").textContent = "Hoje é " + new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"});
 
@@ -850,7 +858,9 @@ header.panel{margin-bottom:20px}
   const regClosed = () => Date.now() >= regDeadline();
   const pad2 = n => String(n).padStart(2,"0");
   let wasClosed = null;
+  let lastToday = today();
   function tick(){
+    if(today()!==lastToday){ lastToday=today(); sel=null; editorFor=null; render(); return; }
     const left = regDeadline() - Date.now(), box=$("countdown");
     box.hidden = left<=0;
     if(left>0){
@@ -913,14 +923,17 @@ header.panel{margin-bottom:20px}
       const open=isOpen(n), v=dayPts((me.days||{})[n])+(postDaysOf(me).has(n)?1:0);
       if(!open) b.classList.add("locked");
       const ent=(me.days||{})[n];
-      const missed = open && v===0 && (!!ent || (!testMode() && dayDate(n)<today()) || (testMode() && n<lastDone(me)));
+      const closed = isClosed(n);
+      const missed = open && v===0 && (closed || !!ent || (testMode() && n<lastDone(me)));
+      if(closed) b.classList.add("closed");
       if(v>0) b.classList.add("done");
       if(missed) b.classList.add("missed");
       if(dayDate(n)===today()) b.classList.add("today");
       if(n===sel) b.classList.add("sel");
       b.disabled=!open;
-      b.setAttribute("aria-label",`Dia ${n}, ${fmt(dayDate(n))}${open?"":" — bloqueado"}`);
-      b.innerHTML=`<span class="d">${n}</span><span class="dt">${fmt(dayDate(n))}</span><span class="p">${!open?"🔒":missed?"✕":v?v+(v>1?" pts":" pt"):"—"}</span>`;
+      const ptsTxt = v+(v===1?" pt":" pts");
+      b.setAttribute("aria-label",`Dia ${n}, ${fmt(dayDate(n))}${!open?" — bloqueado":closed?` — fechado, ${ptsTxt}`:""}`);
+      b.innerHTML=`<span class="d">${n}</span><span class="dt">${fmt(dayDate(n))}</span><span class="p">${!open?"🔒":closed?ptsTxt:missed?"✕":v?ptsTxt:"—"}</span>`;
       b.onclick=()=>{ sel=n; renderSheet(); };
       box.append(b);
     }
@@ -983,8 +996,12 @@ header.panel{margin-bottom:20px}
       l.querySelector("input").onchange=ev=>{ updEdTotal(); if(t.key==="nofap" && ev.target.checked){ milkSplash(l.querySelector("span")); } };
       c.append(l);
     }
+    const closed = !waiting && isClosed(day);
+    if(closed) c.querySelectorAll("input").forEach(i=>i.disabled=true);
     renderStatus();
-    $("edSave").disabled=!canWrite||waiting;
+    $("edSave").disabled=!canWrite||waiting||closed;
+    $("edSave").hidden=closed;
+    $("dayClosed").hidden=!closed;
     $("edErr").textContent = waiting ? "" : (canWrite?"":"Seu acesso é só de leitura.");
     $("edSaved").hidden=true;
     updEdTotal();
@@ -1162,6 +1179,7 @@ header.panel{margin-bottom:20px}
   $("edSave").onclick = async () => {
     if(saving||sel==null) return;
     if(!isOpen(sel)) { $("edErr").textContent="Calma, viajante do tempo. Esse dia não chegou."; return; }
+    if(isClosed(sel)) { $("edErr").textContent="Esse dia já fechou. Não dá mais pra mexer."; return; }
     const entry={}; for(const t of TASKS) entry[t.key]=$("c_"+t.key).checked;
     const wasFull=isFull((me.days||{})[sel]);
     entry.salvoEm=new Date().toISOString();
