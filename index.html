@@ -1020,7 +1020,7 @@ header.panel{margin-bottom:20px}
     $("edSave").disabled=!canWrite||waiting||closed;
     $("edSave").hidden=closed;
     $("dayClosed").hidden=!closed && !(!waiting && dayDate(day)<today() && canCatchUp(day));
-    $("dayClosed").textContent = closed ? "🔒 Dia fechado. Já era, não dá mais pra mexer." : `⏪ Chegou atrasado, então tá liberado preencher esse dia até ${fmt(catchUpUntil())}. Sem mentir, hein.`;
+    $("dayClosed").textContent = closed ? "🔒 Dia fechado. Já era, não dá mais pra mexer." : (catchUpUntil() ? `⏪ Chegou atrasado, então tá liberado preencher esse dia até ${fmt(catchUpUntil())}. Sem mentir, hein.` : "");
     $("edErr").textContent = waiting ? "" : (canWrite?"":"Seu acesso é só de leitura.");
     $("edSaved").hidden=true;
     updEdTotal();
