@@ -740,7 +740,12 @@ header.panel{margin-bottom:20px}
   const testMode = () => !!(cfg && cfg.testUnlock);
   const isOpen = n => testMode() || dayDate(n) <= today();
   // Dia que já passou fica fechado: dá pra ver, mas não dá mais pra mexer
-  const isClosed = n => !testMode() && dayDate(n) < today();
+  // Quem se inscreveu depois do início pode preencher os dias anteriores à inscrição,
+  // até o fim do dia seguinte ao cadastro. Depois fecha normal.
+  const lateJoin = () => !!(me && me.joined && me.joined > dayDate(1));
+  const catchUpUntil = () => lateJoin() ? addDays(me.joined,1) : null;
+  const canCatchUp = n => lateJoin() && dayDate(n) < me.joined && today() <= catchUpUntil();
+  const isClosed = n => !testMode() && dayDate(n) < today() && !canCatchUp(n);
 
   $("todayLbl").textContent = "Hoje é " + new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"});
 
@@ -1014,7 +1019,8 @@ header.panel{margin-bottom:20px}
     renderStatus();
     $("edSave").disabled=!canWrite||waiting||closed;
     $("edSave").hidden=closed;
-    $("dayClosed").hidden=!closed;
+    $("dayClosed").hidden=!closed && !(!waiting && dayDate(day)<today() && canCatchUp(day));
+    $("dayClosed").textContent = closed ? "🔒 Dia fechado. Já era, não dá mais pra mexer." : `⏪ Chegou atrasado, então tá liberado preencher esse dia até ${fmt(catchUpUntil())}. Sem mentir, hein.`;
     $("edErr").textContent = waiting ? "" : (canWrite?"":"Seu acesso é só de leitura.");
     $("edSaved").hidden=true;
     updEdTotal();
