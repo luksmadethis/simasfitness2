@@ -745,7 +745,14 @@ header.panel{margin-bottom:20px}
   const lateJoin = () => !!(me && me.joined && me.joined > dayDate(1));
   const catchUpUntil = () => lateJoin() ? addDays(me.joined,1) : null;
   const canCatchUp = n => lateJoin() && dayDate(n) < me.joined && today() <= catchUpUntil();
-  const isClosed = n => !testMode() && dayDate(n) < today() && !canCatchUp(n);
+  // Liberações manuais do organizador: quem, qual dia, até quando (inclusive).
+  // Vale uma vez só: salvou depois de "since", o dia fecha de novo.
+  const EXTRA_UNLOCK = [
+    {who:"lukinhas", day:2, until:"2026-11-05", since:"2026-11-05T18:20:00Z"},
+  ];
+  const extraUnlock = n => !!me && EXTRA_UNLOCK.some(x => { if(x.day!==n || today()>x.until || loginSlug(me.name||"")!==x.who) return false;
+    const e=(me.days||{})[n]; return !(e && e.salvoEm && e.salvoEm >= x.since); });
+  const isClosed = n => !testMode() && dayDate(n) < today() && !canCatchUp(n) && !extraUnlock(n);
 
   $("todayLbl").textContent = "Hoje é " + new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"});
 
@@ -1019,8 +1026,9 @@ header.panel{margin-bottom:20px}
     renderStatus();
     $("edSave").disabled=!canWrite||waiting||closed;
     $("edSave").hidden=closed;
-    $("dayClosed").hidden=!closed && !(!waiting && dayDate(day)<today() && canCatchUp(day));
-    $("dayClosed").textContent = closed ? "🔒 Dia fechado. Já era, não dá mais pra mexer." : (catchUpUntil() ? `⏪ Chegou atrasado, então tá liberado preencher esse dia até ${fmt(catchUpUntil())}. Sem mentir, hein.` : "");
+    const xu = !waiting && EXTRA_UNLOCK.find(x=>x.day===day && extraUnlock(day));
+    $("dayClosed").hidden=!closed && !(!waiting && dayDate(day)<today() && (canCatchUp(day)||xu));
+    $("dayClosed").textContent = closed ? "🔒 Dia fechado. Já era, não dá mais pra mexer." : xu ? `🎟️ O organizador liberou esse dia pra tu até ${fmt(xu.until)}. Aproveita e não mente.` : (catchUpUntil() ? `⏪ Chegou atrasado, então tá liberado preencher esse dia até ${fmt(catchUpUntil())}. Sem mentir, hein.` : "");
     $("edErr").textContent = waiting ? "" : (canWrite?"":"Seu acesso é só de leitura.");
     $("edSaved").hidden=true;
     updEdTotal();
