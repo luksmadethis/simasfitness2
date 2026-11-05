@@ -267,6 +267,7 @@ input:focus-visible,textarea:focus-visible,button:focus-visible,.goal input:focu
 .day.closed.missed::after{content:"✕";color:var(--danger)}
 .day.closed .p{font-weight:800}
 .day-closed{font-weight:700;color:var(--muted)}
+.late-list{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.85rem}
 .empty{color:var(--muted);text-align:center;padding:24px 8px}
 .admin{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
 .admin .inline{display:flex;gap:8px;flex-wrap:wrap}
@@ -393,7 +394,10 @@ header.panel{margin-bottom:20px}
       <section class="panel closed-box" id="vClosed" hidden>
         <h2>Inscrições encerradas 🔒</h2>
         <p class="sub" style="margin-top:8px" id="closedText">O desafio já começou e a porta fechou. Fica de olho no ranking e se prepara pro Simasfitness 3.</p>
-        <button class="btn ghost small" type="button" id="closedLogin">Já tem conta? Entrar</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+          <button class="btn ghost small" type="button" id="closedLogin">Já tem conta? Entrar</button>
+          <button class="btn ghost small" type="button" id="closedLate">Fui liberado pelo organizador</button>
+        </div>
       </section>
 
       <!-- Inscrição -->
@@ -528,6 +532,9 @@ header.panel{margin-bottom:20px}
         <label class="toggle"><input type="checkbox" id="aTest"> Liberar todos os dias (modo teste)</label>
         <label class="toggle"><input type="checkbox" id="aFinal"> Mostrar encerramento (teste)</label>
         <button class="btn ghost small" id="aWipe" type="button" hidden>Apagar meus dias de teste</button>
+        <span class="label" style="margin-top:8px">Liberar inscrição atrasada</span>
+        <div class="inline"><input type="text" id="aLateName" placeholder="Nome da pessoa (ex.: Alan)"><button class="btn small" id="aLateAdd" type="button">Liberar</button></div>
+        <div id="aLateList" class="late-list"></div>
         <span class="label" style="margin-top:8px">Transferir ficha para outro aparelho</span>
         <select id="aFrom"></select>
         <div class="inline"><input type="text" id="aTo" placeholder="Código do aparelho novo"><button class="btn small" id="aMove" type="button">Transferir</button></div>
@@ -883,7 +890,7 @@ header.panel{margin-bottom:20px}
     renderFinal();
     if(!db){ return; }
     if(!me && loginMode){ show("vLogin"); return; }
-    if(!me && regClosed()){ $("closedText").textContent=reg().closed; show("vClosed"); return; }
+    if(!me && regClosed() && !lateMode && !loggedLate()){ $("closedText").textContent=reg().closed; show("vClosed"); return; }
     if(!me || editing){ fillSignup(); show("vSignup"); return; }
     renderSheet(); show("vSheet");
     const cu=firebase.auth().currentUser; $("pinBox").hidden = !(cu && cu.isAnonymous);
@@ -899,6 +906,7 @@ header.panel{margin-bottom:20px}
     for(const id of ["fName","fAge","fHeight","fWeight"]) $(id).disabled = isEdit;
     const cuF=firebase.auth().currentUser, logged = !!(cuF && !cuF.isAnonymous);
     $("termsBox").hidden = isEdit; $("pinField").hidden = isEdit || logged; $("haveAccount").hidden = isEdit || logged;
+    if(!isEdit && regClosed()){ $("signupDeadline").textContent="🎟️ Inscrição atrasada: só entra quem o organizador liberou, com o nome exatamente como ele cadastrou."; }
     if(!isEdit && logged){ $("signupTitle").textContent="Termina tua inscrição"; $("signupSub").textContent="Tua conta já existe, mas a ficha ficou pela metade. Completa aqui que tá resolvido."; }
     document.querySelectorAll('input[name=goal]').forEach(g=>g.disabled=isEdit);
     if(isEdit){ $("signupTitle").textContent="Trocar foto"; $("signupSub").textContent="Só a foto muda. O resto ficou gravado na pedra."; $("signupBtn").textContent="Salvar foto"; }
@@ -1124,7 +1132,7 @@ header.panel{margin-bottom:20px}
     const age=parseInt($("fAge").value,10);
     const height=parseFloat($("fHeight").value), weight=parseFloat(String($("fWeight").value).replace(",","."));
     const goal=(document.querySelector('input[name=goal]:checked')||{}).value;
-    if(!me && regClosed()) return err.textContent="Inscrições encerradas. Chegou atrasado.";
+    if(!me && regClosed() && !lateList().includes(loginSlug(name))) return err.textContent="Esse nome não foi liberado pra inscrição atrasada. Fala com o organizador (o nome tem que ser igual ao que ele liberou).";
     if(!name) return err.textContent="Faltou o nome, chefe.";
     if(people.some(p=>p._id!==uid && (p.name||"").trim().toLowerCase()===name.toLowerCase())) return err.textContent="Esse nome já tem dono. Usa um apelido.";
     if(!(age>=10&&age<=100)) return err.textContent="Idade de verdade aí, entre 10 e 100.";
@@ -1392,6 +1400,11 @@ header.panel{margin-bottom:20px}
   const pinPass = pin => "sf2-pin-"+pin;
   $("toLogin").onclick=()=>{ loginMode=true; $("loginErr").textContent=""; render(); };
   $("closedLogin").onclick=()=>{ loginMode=true; render(); };
+  // Exceção de inscrição atrasada: organizador libera nomes em config/challenge.lateSignups
+  let lateMode=false;
+  const lateList = () => (cfg && Array.isArray(cfg.lateSignups)) ? cfg.lateSignups : [];
+  const loggedLate = () => { const u=firebase.auth().currentUser; if(!u||u.isAnonymous||!u.email) return false; return lateList().includes(u.email.split("@")[0]); };
+  $("closedLate").onclick=()=>{ lateMode=true; render(); };
   $("toSignup").onclick=()=>{ loginMode=false; render(); };
   $("loginForm").addEventListener("submit", async ev=>{
     ev.preventDefault();
@@ -1428,6 +1441,23 @@ header.panel{margin-bottom:20px}
     const done=()=>{ b.textContent="Copiado!"; setTimeout(()=>b.textContent="Copiar",1500); };
     if(navigator.clipboard) navigator.clipboard.writeText(uid).then(done).catch(()=>{}); else done();
   });
+  function renderLate(){
+    const box=$("aLateList"); if(!box) return; box.textContent="";
+    for(const slug of lateList()){
+      const done=people.some(p=>p.login===slug);
+      const chip=document.createElement("span"); chip.className="chip"; chip.textContent=slug+(done?" ✓ inscrito":" · aguardando");
+      const x=document.createElement("button"); x.type="button"; x.className="linkbtn"; x.textContent="remover"; x.style.marginLeft="6px";
+      x.onclick=async()=>{ try{ await db.doc("config/challenge").set({...(cfg||{}), lateSignups:lateList().filter(v=>v!==slug)}); }catch{ $("aErr").textContent="Não deu pra remover."; } };
+      const w=document.createElement("span"); w.append(chip,x); box.append(w);
+    }
+  }
+  $("aLateAdd").onclick=async()=>{
+    const slug=loginSlug($("aLateName").value.trim()); $("aErr").textContent="";
+    if(!slug) return $("aErr").textContent="Digita o nome.";
+    if(lateList().includes(slug)) return $("aErr").textContent="Esse nome já tá liberado.";
+    try{ await db.doc("config/challenge").set({...(cfg||{}), lateSignups:[...lateList(), slug]}); $("aLateName").value=""; $("aErr").textContent=`Liberado! Fala pro ${slug} se inscrever com esse nome.`; }
+    catch{ $("aErr").textContent="Não deu pra liberar."; }
+  };
   function renderAdmin(){
     $("admin").hidden=!isAdmin; if(!isAdmin) return;
     const sel=$("aFrom"), cur=sel.value; sel.textContent="";
@@ -1465,7 +1495,7 @@ header.panel{margin-bottom:20px}
 
     db.doc("config/admins").onSnapshot(s=>{ const d=s.exists?s.data():{}; isAdmin=Array.isArray(d.uids)&&d.uids.includes(uid); renderAdmin(); }, ()=>{});
     db.doc("config/challenge").onSnapshot(s=>{
-      cfg = s.exists ? s.data() : null;
+      cfg = s.exists ? s.data() : null; renderLate();
       $("aStart").value=startDate();
       $("aTest").checked=testMode(); $("aFinal").checked=!!(cfg&&cfg.forceEnd); $("aWipe").hidden=!testMode();
       sel=null; render();
@@ -1478,7 +1508,7 @@ header.panel{margin-bottom:20px}
     db.collection("participants").onSnapshot(s=>{
       people = s.docs.map(x=>({...x.data(), _id:x.id}));
       me = people.find(p=>p._id===uid) || null;
-      render(); renderFeed(); renderAdmin();
+      render(); renderFeed(); renderAdmin(); renderLate();
     }, ()=>{ show("vOffline"); });
   });
 })();
