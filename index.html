@@ -864,7 +864,9 @@ header.panel{margin-bottom:20px}
 
   // ---- prazo de inscrição: até 00:00 do dia de início ----
   const regDeadline = () => parse(startDate()).getTime(); // meia-noite local do Dia 1
-  const regClosed = () => Date.now() >= regDeadline();
+  // Inscrições reabertas pelo organizador depois do início (pra fechar de novo, volta pra false)
+  const REG_REOPEN = true;
+  const regClosed = () => !REG_REOPEN && Date.now() >= regDeadline();
   const pad2 = n => String(n).padStart(2,"0");
   let wasClosed = null;
   let lastToday = today();
@@ -906,6 +908,7 @@ header.panel{margin-bottom:20px}
     for(const id of ["fName","fAge","fHeight","fWeight"]) $(id).disabled = isEdit;
     const cuF=firebase.auth().currentUser, logged = !!(cuF && !cuF.isAnonymous);
     $("termsBox").hidden = isEdit; $("pinField").hidden = isEdit || logged; $("haveAccount").hidden = isEdit || logged;
+    if(!isEdit && REG_REOPEN && Date.now() >= regDeadline()){ $("signupDeadline").textContent="🔓 Inscrições reabertas! Corre que ainda dá tempo. Os dias que já passaram contam como 0."; }
     if(!isEdit && regClosed()){ $("signupDeadline").textContent="🎟️ Inscrição atrasada: só entra quem o organizador liberou, com o nome exatamente como ele cadastrou."; }
     if(!isEdit && logged){ $("signupTitle").textContent="Termina tua inscrição"; $("signupSub").textContent="Tua conta já existe, mas a ficha ficou pela metade. Completa aqui que tá resolvido."; }
     document.querySelectorAll('input[name=goal]').forEach(g=>g.disabled=isEdit);
